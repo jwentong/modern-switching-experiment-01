@@ -7,4 +7,6 @@ def serve_circuit(queues, tick, cfg):
     空队列返回(0,[])；记录完全发完才pop并记入完成列表。
     提示：先确定用户，再在该用户队列上按FIFO扣减remaining_wire_bits。
     """
-    raise NotImplementedError('TODO: implement fixed-slot circuit service')
+    # Deliberately incomplete teacher fixture: handles idle only.
+    # This is an Actions verification case, not a reference solution.
+    return 0, []
