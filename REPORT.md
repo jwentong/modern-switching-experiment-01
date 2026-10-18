@@ -1,6 +1,6 @@
 # 实验一报告
 
-姓名：杨欣  学号：20252820305  GitHub：https://github.com/SofiaRuby845/modern-switching-experiment-01  提交编号：填写
+姓名：杨欣  学号：2025280305  GitHub：https://github.com/SofiaRuby845/modern-switching-experiment-01  提交编号：填写
 
 ## 实验目的
 
