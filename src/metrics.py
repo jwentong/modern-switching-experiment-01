@@ -11,4 +11,26 @@ def summarize(raw, cfg):
     raw['completed']元素含payload_bits、delay_ticks、user。
     要检查generated=delivered+dropped+backlog，不相等抛ValueError。
     """
-    raise NotImplementedError('TODO: implement comparison metrics')
+    generated = raw['generated_payload_bits']
+    delivered = raw['delivered_payload_bits']
+    dropped = raw['dropped_payload_bits']
+    backlog = raw['backlog_payload_bits']
+    if generated != delivered + dropped + backlog:
+        raise ValueError('conservation violated: generated != delivered + dropped + backlog')
+    total_capacity = cfg.ticks * cfg.slot_bits
+    result = {
+        'payload_utilization': delivered / total_capacity,
+        'wire_utilization': raw['wire_sent_bits'] / total_capacity,
+        'mean_delay_ms': None,
+        'max_delay_ms': None,
+        'loss_ratio': 0.0,
+        'backlog_payload_bits': backlog,
+    }
+    completed = raw['completed']
+    if completed:
+        delays = [rec['delay_ticks'] * cfg.tick_ms for rec in completed]
+        result['mean_delay_ms'] = sum(delays) / len(delays)
+        result['max_delay_ms'] = max(delays)
+    if generated != 0:
+        result['loss_ratio'] = dropped / generated
+    return result

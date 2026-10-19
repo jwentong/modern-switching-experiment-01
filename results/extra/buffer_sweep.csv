@@ -1,0 +1,5 @@
+﻿buffer_payload_bits,circuit_loss,circuit_backlog,packet_loss,packet_backlog
+512,0.6015625,384,0.0,0
+1024,0.5234375,864,0.0,0
+2048,0.3515625,1920,0.0,0
+4096,0.18359375,3936,0.0,0
