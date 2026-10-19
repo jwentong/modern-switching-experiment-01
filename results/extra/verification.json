@@ -1,0 +1,19 @@
+{
+  "python": "3.11.9",
+  "seed": 2026,
+  "teaching_base_sha": "bc9099e3f932168af640ce0d03abc2c3f283e10f",
+  "checked_result_rows": 80,
+  "checks": "passed",
+  "sha256": {
+    "comparison.json": "89ef5c939b07c94f87455f5f46e62c02abd368a7c6c964cf945164d7c12c1ff1",
+    "comparison.csv": "0a8bcbfff4986d19ed69201a25dae1f27f9331bf43a84393e63b8449e19ad978",
+    "comparison_metrics.png": "9fa2fc92e17bcbe3793b49736c19367fb687b9429384992f29dd2cb3ef05dde9",
+    "queue_occupancy.png": "2e297fe0ee89b7647ae880d074ad26baa19191990c2b15925d61361ed0c42aea",
+    "pcm_frame_view.png": "6341f1d16092a3b48f6db885566dfbb752cc5262d92799a1c3ed2af2670bdf16",
+    "extra/header_scan.json": "d434da49fd0b31967521ea3d9ff6ff03f34ed3a1dec86c720c338684d732fba0",
+    "extra/header_scan.csv": "2b12265ac5878e1a5ef96da7fdb9a1913da8307af949ffbadaa087484400acb6",
+    "extra/buffer_scan.json": "bbb5073964c09bd69fd7e482bf50c5256044e743024498debddec762b9d3bb07",
+    "extra/buffer_scan.csv": "a5a7614287e73f9ea3ded9344b8d8c30ff094dc5d89c07b56f3c66260956e744"
+  },
+  "consecutive_identical_runs": 3
+}
