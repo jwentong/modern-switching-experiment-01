@@ -1,9 +1,31 @@
-"""任务2：补全共享FIFO分组交换发送。"""
-def serve_packet(queue, tick, cfg):
-    """queue为共享deque[Pending]，原地更新。
-    remaining_wire_bits已由框架初始化为payload_bits+header_bits，不再重复加包头。
-    每tick发送不超过slot_bits；必须发完队首再处理下一项。
-    分组允许跨tick续传，但不得与其他分组交错，不能因大于一个时隙就丢弃。
-    返回(线速发送比特数,完整发送的Pending列表)；空队列返回(0,[])。
-    """
-    raise NotImplementedError('TODO: implement shared FIFO packet service')
+from collections import deque
+from .models import Pending
+
+def serve_packet(queues, tick, cfg):
+    wire_bits = 0
+    completed_records = []
+    budget = cfg.slot_bits
+
+    # 兼容两种输入：
+    # 1. 单元测试：queues是deque（报文队列）
+    # 2. 集成仿真：queues是list[deque]，取索引0作为全局FIFO
+    if isinstance(queues, deque):
+        q = queues
+    else:
+        # queues是列表，取第0个队列作为包交换的全局FIFO
+        if len(queues) == 0:
+            return (wire_bits, completed_records)
+        q = queues[0]
+
+    while budget > 0 and q:
+        pkt = q[0]
+        send_amt = min(budget, pkt.remaining_wire_bits)
+        pkt.remaining_wire_bits -= send_amt
+        wire_bits += send_amt
+        budget -= send_amt
+
+        if pkt.remaining_wire_bits == 0:
+            finished = q.popleft()
+            completed_records.append(finished)
+
+    return (wire_bits, completed_records)
