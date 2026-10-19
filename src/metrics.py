@@ -1,14 +1,36 @@
 """任务3：补全指标统计。"""
 def summarize(raw, cfg):
-    """返回字典，键名必须保留：
-    payload_utilization=delivered_payload_bits/(cfg.ticks*cfg.slot_bits)
-    wire_utilization=wire_sent_bits/(cfg.ticks*cfg.slot_bits)
-    mean_delay_ms、max_delay_ms：完成记录的delay_ticks乘cfg.tick_ms；
-      无完成记录时两者返回None，不能写0掩盖无送达。
-    loss_ratio=dropped_payload_bits/generated_payload_bits；无生成数据时为0。
-    backlog_payload_bits：所有未完成记录的原始payload总和，直接取raw对应值。
-    只用观察窗口[0,ticks)，不追加排空时间；有效载荷按完整交付记录计数。
-    raw['completed']元素含payload_bits、delay_ticks、user。
-    要检查generated=delivered+dropped+backlog，不相等抛ValueError。
-    """
-    raise NotImplementedError('TODO: implement comparison metrics')
+    capacity = cfg.ticks * cfg.slot_bits
+
+    delivered = raw["delivered_payload_bits"]
+    wire = raw["wire_sent_bits"]
+    dropped = raw["dropped_payload_bits"]
+    generated = raw["generated_payload_bits"]
+    backlog = raw["backlog_payload_bits"]
+
+    if generated != delivered + dropped + backlog:
+        raise ValueError("bit conservation failed")
+
+    completed = raw["completed"]
+
+    if completed:
+        delays = []
+        for rec in completed:
+            if isinstance(rec, dict):
+                delays.append(rec["delay_ticks"])
+            else:
+                delays.append(rec.delay_ticks)
+        mean_delay_ms = (sum(delays) / len(delays)) * cfg.tick_ms
+        max_delay_ms = max(delays) * cfg.tick_ms
+    else:
+        mean_delay_ms = None
+        max_delay_ms = None
+
+    return {
+        "payload_utilization": delivered / capacity if capacity else 0,
+        "wire_utilization": wire / capacity if capacity else 0,
+        "mean_delay_ms": mean_delay_ms,
+        "max_delay_ms": max_delay_ms,
+        "loss_ratio": dropped / generated if generated else 0,
+        "backlog_payload_bits": backlog,
+    }
