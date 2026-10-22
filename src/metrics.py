@@ -11,4 +11,45 @@ def summarize(raw, cfg):
     raw['completed']元素含payload_bits、delay_ticks、user。
     要检查generated=delivered+dropped+backlog，不相等抛ValueError。
     """
-    raise NotImplementedError('TODO: implement comparison metrics')
+       # 1. 从 raw 字典中提取基础数据
+    generated = raw.get('generated_payload_bits', 0)
+    dropped = raw.get('dropped_payload_bits', 0)
+    backlog = raw.get('backlog_payload_bits', 0)
+    wire_sent = raw.get('wire_sent_bits', 0)
+    completed_records = raw.get('completed', [])
+
+    # 2. 计算已交付载荷
+    delivered = sum(rec['payload_bits'] for rec in completed_records)
+
+    # 3. 守恒检查
+    if generated != (delivered + dropped + backlog):
+        raise ValueError(f"守恒不成立: 生成({generated}) != 交付({delivered}) + 丢弃({dropped}) + 积压({backlog})")
+
+    # 4. 计算各种利用率
+    total_capacity = cfg.ticks * cfg.slot_bits
+    payload_utilization = delivered / total_capacity
+    wire_utilization = wire_sent / total_capacity
+
+    # 5. 计算丢失率（如果没生成数据，直接为0）
+    loss_ratio = (dropped / generated) if generated > 0 else 0
+
+    # 6. 计算时延
+    # 把每条完成记录的 delay_ticks 提取出来，组成一个列表
+    delays = [rec['delay_ticks'] for rec in completed_records]
+    
+    if delays:  # 如果列表不为空（有完成的记录）
+        mean_delay_ms = (sum(delays) / len(delays)) * cfg.tick_ms
+        max_delay_ms = max(delays) * cfg.tick_ms
+    else:       # 没有任何记录完成
+        mean_delay_ms = None
+        max_delay_ms = None
+
+    # 7. 组装返回字典
+    return {
+        'payload_utilization': payload_utilization,
+        'wire_utilization': wire_utilization,
+        'mean_delay_ms': mean_delay_ms,
+        'max_delay_ms': max_delay_ms,
+        'loss_ratio': loss_ratio,
+        'backlog_payload_bits': backlog
+    }
